@@ -1,0 +1,861 @@
+
+        <!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>使用minikube安装k8s单节点集群-云栖社区-阿里云</title>
+  <meta name="keywords" content="linux,cluster,集群,容器,Registry,Bash,k8s,Minikube" />
+  <meta name="description" content="
+
+什么是minikube
+minikube是一款快速在本地笔记本电脑上开启一个虚拟机搭建kubernets单节点kubernetes集群的工具，因为一些网络的原因，所以我这里使用的是阿里云修改过的minikube
+安装
+首先你要确保本地安装了virtualbox，如果你是使用linux的连virt...">
+  <meta name="applicable-device" content="pc">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <link rel="alternate" media="only screen and(max-width: 640px)" href="https://m.aliyun.com/yunqi/articles/574255" >
+  <meta name="mobile-agent" content="format=html5;url=https://m.aliyun.com/yunqi/articles/574255">
+  <meta name="mobile-agent" content="format=xhtml;url=https://m.aliyun.com/yunqi/articles/574255">
+  <meta name="mobile-agent" content="format=wml;url=https://m.aliyun.com/yunqi/articles/574255">
+  <link rel="canonical" href="https://yq.aliyun.com/articles/574255"/>
+  <meta name="renderer" content="webkit">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-param" content="yunqi_csrf"/>
+  <meta name="csrf-token" content="R7E1UU79K1"/>
+  <meta name="data-spm" content="a2c4e"/>
+  <meta name="ahot-aplus" content="1">
+      <link rel="stylesheet" href="//at.alicdn.com/t/font_422887_hlfuaa72mk70t3xr.css">
+    <style>
+    .yq-blog-detail .content-detail{
+        line-height: 1.8;
+    }
+    .yq-blog-detail .content-detail p{
+        margin: 0 0 16px;
+    }
+</style>
+    <link href="/mditor/css/mditor.min.css" rel="stylesheet">
+    <style>
+        .markdown-body pre{
+            background-color: #333;
+            color: #f8f8f2;
+        }
+        .language-css .token.string, .style .token.string, .token.entity, .token.operator, .token.url {
+            background: none;
+        }
+    </style>
+    <link rel="stylesheet" href="//g.alicdn.com/aliyun/yunqi/1.0.99/css/teamBlogDetail.css" charset="utf-8" />
+    <script src="//www.aliyun.com/rgn/aliyun_assets?renderer=js"></script>
+    <script src="//g.alicdn.com/aliyun/goldeneye-deploy/0.0.1/static/goldeneye.js"></script>
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_422887_vrqbpml6oos.css">
+</head>
+
+<body data-spm="11153940"><script type="text/javascript">
+(function (d) {
+var t=d.createElement("script");t.type="text/javascript";t.async=true;t.id="tb-beacon-aplus";
+t.setAttribute("exparams","category=&userid=&aplus&yunid=&yunpk=");
+t.src="//g.alicdn.com/alilog/mlog/aplus_int.js";
+d.getElementsByTagName("head")[0].appendChild(t);
+})(document);
+</script>
+
+      <!--top-header begin-->
+<div class="yq-top-header">
+<div class="container">
+  <ul class="nav nav_top_bar" data-spm="minheadermenu">
+    <li class="logo-panel">
+      <a href="https://www.aliyun.com" target="_blank">
+        <img class="black" style="z-index: 2;" src="//img.alicdn.com/tps/TB16hl5LpXXXXXRXVXXXXXXXXXX-198-46.png">
+        <img class="black" style="z-index: 1;" src="//img.alicdn.com/tps/TB1BQh7LpXXXXcJXFXXXXXXXXXX-198-46.gif">
+      </a>
+    </li>
+    <li class="divide-line"></li>
+    <li><a href="https://yq.aliyun.com/" target="_blank">云栖社区</a></li>
+    <li class="divide-line"></li>
+    <li><a href="/articles/" target="_blank">博客</a></li>
+    <li class="divide-line"></li>
+    <li><a href="/ask/" target="_blank">问答</a></li>
+    <li class="divide-line"></li>
+    <li><a href="/roundtable/" target="_blank" rel="nofollow">聚能聊</a></li>
+    <li class="divide-line"></li>
+    <li><a href="/live/" target="_blank">直播</a></li>
+    <li class="divide-line"></li>
+    <li><a href="https://bbs.aliyun.com" target="_blank" rel="nofollow">论坛</a></li>
+    <li class="divide-line"></li>
+    <li><a href="/teams/" target="_blank" rel="nofollow">云栖号</a></li>
+    <li class="divide-line"></li>
+    <li><a href="/publication/" target="_blank" rel="nofollow">订阅</a></li>
+    <li class="divide-line"></li>
+    <li><a href="/activity/820/" target="_blank" rel="nofollow">小程序云</a></li>
+    <li class="divide-line"></li>
+    <li><a href="https://edu.aliyun.com" target="_blank">云大学</a></li>
+
+
+    <li class="divide-line special-line"></li>
+    <li class="more-nav">
+        <a href="javascript:;" >更多<i class="icon icon-show-more"></i><i class="icon icon-arrow-up-o"></i></a>
+        <ul class="sub-more-nav">
+            <li class="nav-item">
+              <a href="/download/" target="_blank">下载</a>
+            </li>
+          <li class="nav-item">
+            <a href="/video/" target="_blank" rel="nofollow">视频</a>
+          </li>
+          <li class="nav-item"><a href="/cloud" target="_blank">云头条</a></li>
+          <li class="nav-item"><a href="/big-data" target="_blank" rel="nofollow">大数据</a></li>
+          <!--<li class="nav-item"><a href="/marketplace" target="_blank" rel="nofollow">云生态</a></li>
+          <li class="nav-item">
+            <a href="/opensource" target="_blank" rel="nofollow">阿里开源</a>
+          </li>-->
+            <li class="nav-item">
+              <a href="/expert/" target="_blank" rel="nofollow">云栖专家</a>
+            </li>
+        </ul>
+    </li>
+  </ul>
+  <ul class="nav nav_top_bar y-right" data-spm="minheaderreg">
+        <li>
+      <a href="https://account.aliyun.com/login/login.htm?from_type=yqclub&amp;oauth_callback=https%3A%2F%2Fyq.aliyun.com%2Farticles%2F574255%3Fspm%3D5176.10695662.1996646101.searchclickresult.2e432cd2NISoz0%26do%3Dlogin">登录</a>
+    </li>
+    <li class="divide-line"></li>
+    <li>
+      <a href="https://account.aliyun.com/register/register.htm?from_type=yqclub&amp;oauth_callback=https%3A%2F%2Fyq.aliyun.com%2Farticles%2F574255%3Fspm%3D5176.10695662.1996646101.searchclickresult.2e432cd2NISoz0%26do%3Dlogin">注册</a>
+    </li>
+        <li class="divide-line"></li>
+    <li>
+      <a href="https://www.aliyun.com/app?spm=5176.100238.headermenu.26.I61Lyz" target="_blank">下载APP</a>
+    </li>
+  </ul>
+</div>
+</div>
+<!--top-header end-->
+
+<div class="yq-pub-header" style="background-image: url('https://img.alicdn.com/tps/TB1EN1hOpXXXXbJapXXXXXXXXXX-1390-115.png');background-color:#eef0f2">
+    <div class="container">
+        <a href="/teams/232" target="_self">
+            <img src="https://yqfile.alicdn.com/img_6a6dccaf8b80f594566c562f7a70dd62.png" alt="云璨技术团队" class="p-logo">
+            <span class="title-info">云璨技术团队</span>
+        </a>  
+        
+        
+                <a id="attention-opt" href="javascript:;" data-type="team" data-teamid="232" data-attention="0" class="y-btn-white opt-btn">+ 关注</a>
+                
+                    <div class="qr-panel">
+                <div class="qr-content">
+                    <div class="t-info">
+                        <span class="text-info">手机版</span>
+                        <i class="down-arrow"></i>
+                    </div>
+                    <img src="https://yq.aliyun.com/api/qrcode?size=138&amp;key=1079a06ed8066dcfc7f55f58a46fc679789eb795&amp;text=https%3A%2F%2Fyq.aliyun.com%2Fteams%2F232" alt="" class="qr-mobile" style="padding: 7px;">
+                </div>
+            </div>
+            </div>
+</div>
+<script>
+    $(function() {
+        $(document).on('mouseenter', '#attention-opt', (e) => {
+            const event = e || widnow.evnet;
+            const $this = $(event.currentTarget);
+            if ($this.text().trim() === '已关注') {
+                $this.addClass('over').text('取消关注');
+            }
+            $(document).on('mouseleave', '#attention-opt', (e) => {
+                $this.removeClass('over');
+                if ($this.text() === '取消关注') {
+                    $this.text('已关注');
+                }
+            })
+        })
+    })
+</script>
+  <div class="hiddenTitleArea ">
+    <p class="hiddenTitle">使用minikube安装k8s单节点集群</p>
+</div>
+<div class="yq-main">
+    <ol class="yq-breadcrumb tag-breadcrumb">
+                <li><a href="/">云栖社区</a><span>&gt;</span></li>
+        <li><a href="/teams/232">云璨技术团队</a><span>&gt;</span></li>
+        <li><a href="/teams/232/type_blog">博客</a><span>&gt;</span></li>
+        <li class="active">正文</li>
+    </ol>
+    <div class="yq-main-left yq-blog-detail" data-spm="blogcont574255">
+            <a onclick="bannerClick('1803')" href="https://yq.aliyun.com/live/972" class="yq_blog_detail_1803" target="_blank" rel="nofollow">
+            <img src="https://yqfile.alicdn.com/img_d4ac531d5837ec072592634b1f07c5d0.jpg" alt="" style="width:700px;margin-bottom:20px;height:50px" />
+        </a>
+        <h2 class="blog-title">
+                                使用minikube安装k8s单节点集群
+    </h2>
+    <div class="blog-o-info">
+                    <div class="other-opt">
+                                <!-- 管理推荐 -->
+                            </div>
+                <a href="/users/x63t45s3xlkqq" class="b-author" rel="nofollow">bboysoul</a>
+        <span class="b-time icon-shijian1">2018-04-02 16:20:43</span>
+        <span class="b-watch icon-View" >浏览5545</span>
+        <span class="b-comment icon-pinglun">评论0</span>
+
+                                                                                                                                                        
+    </div>
+            <ul class="tag-group">
+                            <li class="tag tag-item">
+                    <a href="/tags/type_blog-tagid_10/" class="label-item"><span>linux</span></a>
+                </li>
+                            <li class="tag tag-item">
+                    <a href="/tags/type_blog-tagid_743/" class="label-item"><span>cluster</span></a>
+                </li>
+                            <li class="tag tag-item">
+                    <a href="/tags/type_blog-tagid_785/" class="label-item"><span>集群</span></a>
+                </li>
+                            <li class="tag tag-item">
+                    <a href="/tags/type_blog-tagid_985/" class="label-item"><span>容器</span></a>
+                </li>
+                            <li class="tag tag-item">
+                    <a href="/tags/type_blog-tagid_1861/" class="label-item"><span>Registry</span></a>
+                </li>
+                            <li class="tag tag-item">
+                    <a href="/tags/type_blog-tagid_2850/" class="label-item"><span>Bash</span></a>
+                </li>
+                            <li class="tag tag-item">
+                    <a href="/tags/type_blog-tagid_5705/" class="label-item"><span>k8s</span></a>
+                </li>
+                            <li class="tag tag-item">
+                    <a href="/tags/type_blog-tagid_22855/" class="label-item"><span>Minikube</span></a>
+                </li>
+                    </ul>
+    
+    
+            <p class="blog-summary">
+            <em>摘要：</em>
+            
+
+什么是minikube
+minikube是一款快速在本地笔记本电脑上开启一个虚拟机搭建kubernets单节点kubernetes集群的工具，因为一些网络的原因，所以我这里使用的是阿里云修改过的minikube
+安装
+首先你要确保本地安装了virtualbox，如果你是使用linux的连virt...
+        </p>
+    
+    <div class="content-detail markdown-body">
+                    
+<p><img src="https://upload-images.jianshu.io/upload_images/3778244-1bfc95901830a55e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="" title=""></p>
+<h3>什么是minikube</h3>
+<p>minikube是一款快速在本地笔记本电脑上开启一个虚拟机搭建kubernets单节点kubernetes集群的工具，因为一些网络的原因，所以我这里使用的是阿里云修改过的minikube</p>
+<h3>安装</h3>
+<p>首先你要确保本地安装了virtualbox，如果你是使用linux的连virtualbox都可以不用安装直接支持在主机上安装k8s<br>接着安装<br><code>curl -Lo minikube http://kubernetes.oss-cn-hangzhou.aliyuncs.com/minikube/releases/v0.25.2/minikube-linux-amd64 &amp;&amp; chmod +x minikube &amp;&amp; sudo mv minikube /usr/local/bin/</code><br>现在执行<br><code>minikube version</code><br>能显示minikube的版本就说明安装成功了</p>
+<h3>人生中的第一个k8s集群</h3>
+<p>接着就是创建集群了<br><code>minikube start --vm-driver=virtualbox --registry-mirror=https://registry.docker-cn.com</code><br>--vm-driver的意思就是你使用的是什么虚拟机，因为我是使用virtualbox的，所以参数就是virtualbox<br>还有就是--registry-mirror一定要加，在中国你懂的</p>
+<pre><code class="bash">  temp  minikube start --vm-driver=virtualbox --registry-mirror=https://registry.docker-cn.com
+Starting local Kubernetes v1.9.4 cluster...
+Starting VM...
+Getting VM IP address...
+Moving files into cluster...
+Downloading localkube binary
+ 163.02 MB / 163.02 MB [============================================] 100.00% 0s
+ 0 B / 65 B [----------------------------------------------------------]   0.00%
+ 65 B / 65 B [======================================================] 100.00% 0sSetting up certs...
+Connecting to cluster...
+Setting up kubeconfig...
+Starting cluster components...
+Kubectl is now configured to use the cluster.
+Loading cached images from config file.</code></pre>
+<p>如果你没有安装kubectl会有个提示就是说kubectl这个没有安装，那就把它安装上，但是是要使用代理的这个自己想办法<br>先下载二进制文件<br><code>proxychains wget https://storage.googleapis.com/kubernetes-release/release/v1.9.4/bin/linux/amd64/kubectl</code><br>之后赋予可执行权限<br><code>chmod +x kubectl</code><br>移动路径<br><code>sudo mv kubectl /usr/bin</code><br>之后就是<br><code>kubectl version</code><br>验证下是不是成功了<br>之后就是让kubectl使用minikube的配置文件<br><code>kubectl config use-context minikube</code><br>接着查看下集群的信息<br><code>kubectl cluster-info</code></p>
+<pre><code class="bash">  .kube kubectl cluster-info
+Kubernetes master is running at https://192.168.99.100:8443
+
+To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.</code></pre>
+<p>之后你可以访问你主节点的ip:8443来看看是不是成功了，你还可以打开virtualbox来看一下是不是有一个叫minikube的虚拟机在跑</p>
+<p>之后你查看下集群中的容器有没有在跑<br><code>kubectl get pods --all-namespaces</code></p>
+<pre><code class="bash">  temp kubectl get pods --all-namespaces
+NAMESPACE     NAME                                    READY     STATUS    RESTARTS   AGE
+kube-system   kube-addon-manager-minikube             1/1       Running   0          3m
+kube-system   kube-dns-7cd4f8cd9f-mtkqk               3/3       Running   0          2m
+kube-system   kubernetes-dashboard-7b7c7bd496-9m9cf   1/1       Running   0          2m
+kube-system   storage-provisioner                     1/1       Running   0          2m</code></pre>
+<p>如果正常，那么status都是在running的，不然就是显示容器正在创建，那么表示网络可能会有点问题<br>之后使用命令<br><code>minikube dashboard</code><br>来查看你的k8s的dashboard的地址，一般会在默认的浏览器中直接打开</p>
+
+        
+        <!-- 登录查看 begin -->
+                <!-- 登录查看 end -->
+    </div>
+
+        <div class="copyright-outer-line yq-blog-sem-remove">
+                        <div class="yq-blog-sem-remove copyright-notice">
+                本文为云栖社区原创内容，未经允许不得转载，如需转载请发送邮件至yqeditor@list.alibaba-inc.com；如果您发现本社区中有涉嫌抄袭的内容，欢迎发送邮件至：yqgroup@service.aliyun.com 进行举报，并提供相关证据，一经查实，本社区将立刻删除涉嫌侵权内容。
+            </div>
+                                </div>
+                            <div class="yq-blog-sem-remove yq_blog_sem_remove_1816" style="margin-top: 20px;font-size: 12px;line-height: 1.8;color:#373d41;font-family:PingFangSC-Regular;word-break: break-all;">
+                【云栖快讯】阿里巴巴小程序繁星计划，20亿补贴第一弹云应用免费申请，限量从速！&nbsp;&nbsp;<a onclick="bannerClick('1816')" href="https://yq.aliyun.com/activity/820" target="_blank"  rel="nofollow">详情请点击</a>
+            </div>
+            
+    <div class="footer-detail yq-blog-sem-remove yq-blog-interaction clearfix">
+        <a href="#comment" class="icon-pinglun comment_btn">评论  (<i>0</i>)</a>
+        <span id="vote_btn" has_voted=""   data-aid="574255" data-islogin="false" title="点赞" class="icon-zan opt-btn vote_btn ">点赞 (<span id="vote_num">0</span>)</span>
+        <span id="mark_btn" has_marked="" data-aid="574255" data-islogin="false" title="收藏" class="icon-love opt-btn mark_btn ">收藏 (<span id="mark_num">1</span>)</span>
+        <dl class="share-to">
+            <dt>分享到:</dt>
+            <dd>
+                <a href="http://service.weibo.com/share/share.php?title=%E4%BD%BF%E7%94%A8minikube%E5%AE%89%E8%A3%85k8s%E5%8D%95%E8%8A%82%E7%82%B9%E9%9B%86%E7%BE%A4+%0A%0A%E4%BB%80%E4%B9%88%E6%98%AFminikube%0Aminikube%E6%98%AF%E4%B8%80%E6%AC%BE%E5%BF%AB%E9%80%9F%E5%9C%A8%E6%9C%AC%E5%9C%B0%E7%AC%94%E8%AE%B0%E6%9C%AC%E7%94%B5%E8%84%91%E4%B8%8A%E5%BC%80%E5%90%AF%E4%B8%80%E4%B8%AA%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%90%AD%E5%BB%BAkubernets%E5%8D%95%E8%8A%82%E7%82%B9kubernetes%E9%9B%86%E7%BE%A4%E7%9A%84%E5%B7%A5%E5%85%B7%EF%BC%8C%E5%9B%A0%E4%B8%BA%E4%B8%80%E4%BA%9B%E7%BD%91%E7%BB%9C%E7%9A%84%E5%8E%9F%E5%9B%A0%EF%BC%8C%E6%89%80%E4%BB%A5%E6%88%91%E8%BF%99%E9%87%8C%E4%BD%BF%E7%94%A8%E7%9A%84%E6%98%AF%E9%98%BF%E9%87%8C%E4%BA%91%E4%BF%AE%E6%94%B9%E8%BF%87%E7%9A%84minikube%0A%E5%AE%89%E8%A3%85%0A%E9%A6%96%E5%85%88%E4%BD%A0%E8%A6%81%E7%A1%AE%E4%BF%9D%E6%9C%AC%E5%9C%B0%E5%AE%89%E8%A3%85%E4%BA%86virtualbox%EF%BC%8C%E5%A6%82%E6%9E%9C%E4%BD%A0%E6%98%AF%E4%BD%BF%E7%94%A8linux%E7%9A%84%E8%BF%9Evirt...&amp;url=https%3A%2F%2Fyq.aliyun.com%2Farticles%2F574255" target="_blank" class="icon-weibo"></a>
+                <div class="wechat">
+                    <i class="icon-weixin"></i>
+                    <img src="/api/qrcode?size=140&amp;key=d8f2fce53ce0860e3f73659f01ad7f5324f0102a&amp;text=https%3A%2F%2Fyq.aliyun.com%2Farticles%2F574255" alt="">
+                </div>
+            </dd>
+        </dl>
+    </div>
+    <div class="yq-blog-pre-next yq-blog-sem-remove">
+        <ul class="about-c-list">
+                            <li><a href="/articles/573628">上一篇：解决ESXi主机出现“主机上的系统日志存储在非持久存储器中”</a></li>
+                                        <li><a href="/articles/576056">下一篇：树莓派安装docker</a></li>
+                    </ul>
+    </div>
+            <div class="yq-blog-related-articles yq-blog-sem-remove">
+            <h3 class="title-info">相关文章</h3>
+            <ul class="about-c-list">
+                                    <li>
+                        <a href="/articles/679630">
+                                                            极简的配置单节点Kubernetes（k8s）集群
+                                                    </a>
+                    </li>
+                                    <li>
+                        <a href="/articles/691500">
+                                                            Minikube的安装
+                                                    </a>
+                    </li>
+                                    <li>
+                        <a href="/articles/653231">
+                                                            安装指定版本的minikube
+                                                    </a>
+                    </li>
+                                    <li>
+                        <a href="/articles/679819">
+                                                            Kubernetes(k8s)容器运行时(CRI)简介
+                                                    </a>
+                    </li>
+                                    <li>
+                        <a href="/articles/690581">
+                                                            Kubernetes 实战教学，手把手教您如何在 K8s…
+                                                    </a>
+                    </li>
+                                    <li>
+                        <a href="/articles/680079">
+                                                            k8s安装traefik配置使用ingress
+                                                    </a>
+                    </li>
+                                    <li>
+                        <a href="/articles/679198">
+                                                            Kubernetes使用中发现的问题和错误
+                                                    </a>
+                    </li>
+                                    <li>
+                        <a href="/articles/679787">
+                                                            k8s上安装并初始化Helm。minikube
+                                                    </a>
+                    </li>
+                                    <li>
+                        <a href="/articles/679016">
+                                                            K8S集群管理 | 4个杀手级工具Get
+                                                    </a>
+                    </li>
+                                    <li>
+                        <a href="/articles/679159">
+                                                            容器云之K8s自动化安装方式的选择
+                                                    </a>
+                    </li>
+                            </ul>
+        </div>
+        <div class="yq-blog-comment yq-blog-sem-remove"
+                  data-async-load="true"
+         data-type="article"
+         data-pid="574255"
+         data-p="1"
+             >
+        <h3 class="title-info">网友评论</h3>
+                    <section class="comments-box clearfix">
+                <div class="media-list comments" id="comments">
+                    
+
+<div class="pages comment-tip">
+        
+    
+</div>
+                </div>
+
+                <form accept-charset="UTF-8" action="/comments" method="POST" data-remote="true" data-target="#comments" class="js-comment-create js-active-on-valid css-unlogin">
+                    <input type="hidden" name="type" value="article">
+                    <input type="hidden" name="yunqi_csrf" value="R7E1UU79K1">
+                    <input type="hidden" name="isCheck" value="1">
+                    <input type="hidden" name="pid" value="574255">
+
+                    <div class="form-group">
+                        <div class="editor js-editor">
+                                                            <div class="login_tips" id="comment">登录后可评论，请 <a id="fast_login" href="https://account.aliyun.com/login/login.htm?from_type=yqclub&amp;oauth_callback=https%3A%2F%2Fyq.aliyun.com%2Farticles%2F574255%3Fspm%3D5176.10695662.1996646101.searchclickresult.2e432cd2NISoz0%26do%3Dlogin" class="s4" hidefocus="true" rel="nofollow">登录</a> 或 <a
+                                            href="https://account.aliyun.com/register/register.htm?from_type=yqclub&amp;oauth_callback=https%3A%2F%2Fyq.aliyun.com%2Farticles%2F574255%3Fspm%3D5176.10695662.1996646101.searchclickresult.2e432cd2NISoz0%26do%3Dlogin" target="_blank" class="s4" hidefocus="true" rel="nofollow">注册</a></div>
+                                                    </div><!-- /.editor  -->
+                    </div>
+
+
+                    <div class="form-group text-right">
+                                                    <a href="#modal-login" class="comment_button" data-toggle="modal">评论</a>
+                                            </div>
+                </form>
+            </section>
+            </div>
+</div>
+<div class="yq-main-right" data-spm="blogrightarea574255">
+    <div class="yq-right-sider">
+
+        
+        <!--博主 begin-->
+        <div class="sign-content yq-b-detail">
+            <ul class="nav-tab">
+                <li><span>达人介绍</span></li>
+            </ul>
+            <div class="b-panel">
+                <dl>
+                    <dt>
+                        <div class="user-head">
+                            <a href="/users/x63t45s3xlkqq" rel="nofollow">
+                                <img src="https://ucc.alicdn.com/avatar/img_4ef14db93886a6ec606ba64fc46212fe.jpg" alt="" style="width:100%;height:100%">
+                            </a>
+                        </div>
+                    </dt>
+                    <dd>
+                                                <a href="/users/x63t45s3xlkqq" class="user-name" rel="nofollow">bboysoul</a>
+                                                    <span name="experticon_x63t45s3xlkqq" uid="x63t45s3xlkqq" size="middle" style="position:relative;bottom: 1px;"></span>
+                                            </dd>
+                    <dd class="other">
+                        <span style="margin-right: 10px">文章</span><span>316篇</span>
+                        <i style="padding: 0 10px;">|</i>
+                        <span style="margin-right: 10px">关注</span><span>923</span>
+                    </dd>
+                    <dd>
+                                                                                    <a href="javascript:;" class="y-btn-white" data-islogin="false" data-uid="x63t45s3xlkqq" id="follow-btn" rel="nofollow">+ 关注</a>
+                                                                        </dd>
+                </dl>
+            </div>
+        </div>
+        <!--博主 end-->
+        <!--杂志 begin-->
+                <!--杂志 end-->
+
+        <!--目录 begin-->
+        <div class="sign-content yq-other-catalog" id="category-list-div" style="display:none;">
+            <ul class="nav-tab">
+                <li><span>目录</span></li>
+            </ul>
+            <div class="tags-panel">
+                <ol class="notice-panel" id="category-list">
+
+                </ol>
+            </div>
+        </div>
+        <!--目录 end-->
+                    <!-- 文中提到的云产品start -->
+            <!-- 文中提到的云产品end -->
+        
+                    <!--博主其他文章 begin-->
+            <div class="sign-content yq-other-blogs yq-blog-sem-remove">
+                <ul class="nav-tab">
+                    <li><span>博主其他文章</span></li>
+                    <a href="/users/x63t45s3xlkqq/own" class="more" target="_self" rel="nofollow">更多&gt;</a>
+                </ul>
+                <div class="tags-panel">
+                    <ul class="notice-panel">
+                                                    <li>
+                                <i></i><a href="/articles/695381">shell输入内容时不显示内容</a>
+                            </li>
+                                                    <li>
+                                <i></i><a href="/articles/693582">使用ctop监控容器</a>
+                            </li>
+                                                    <li>
+                                <i></i><a href="/articles/693553">使用metasploit中Evasion模块</a>
+                            </li>
+                                                    <li>
+                                <i></i><a href="/articles/693412">grafana 添加zabbix数据源</a>
+                            </li>
+                                                    <li>
+                                <i></i><a href="/articles/693217">zabbix创建钉钉报警</a>
+                            </li>
+                                                    <li>
+                                <i></i><a href="/articles/693002">升级kali linux到2019.1</a>
+                            </li>
+                                                    <li>
+                                <i></i><a href="/articles/692969">kubeadm搭建k8s v1.10.13</a>
+                            </li>
+                                                    <li>
+                                <i></i><a href="/articles/692464">在终端中显示图片</a>
+                            </li>
+                                                    <li>
+                                <i></i><a href="/articles/692091">使用docker-compose搭建zabbix</a>
+                            </li>
+                                                    <li>
+                                <i></i><a href="/articles/691594">解决gitlab限制上传大小文件的问题</a>
+                            </li>
+                                            </ul>
+                </div>
+            </div>
+            <!--博主其他文章 end-->
+        
+                    <!--相关话题 begin-->
+            <div class="sign-content yq-related-topics yq-blog-sem-remove" id="related-roundtables">
+                <ul class="nav-tab">
+                    <li><span>相关话题</span></li>
+                    <a href="/roundtable" class="more" target="_self" rel="nofollow">更多&gt;</a>
+                </ul>
+                <div class="tags-panel">
+                    <ul class="notice-panel">
+                                                    <li>
+                                <i></i><a href="/roundtable/495797">更新云上技能包：如何更优雅地完成云资源创建和部署？</a>
+                            </li>
+                                                    <li>
+                                <i></i><a href="/roundtable/494621">runC爆严重漏洞影响Kubernetes、Docker，你的容器还安全吗？</a>
+                            </li>
+                                                    <li>
+                                <i></i><a href="/roundtable/479122">为什么同样的云计算需求，别人买的更便宜？！</a>
+                            </li>
+                                                    <li>
+                                <i></i><a href="/roundtable/461878">【重磅福利】参与话题就送书！EDAS邀你有奖评测，最高可得800元淘宝心选礼品+800元阿里云代金券</a>
+                            </li>
+                                                    <li>
+                                <i></i><a href="/roundtable/458786">【有奖讨论】ORACLE数据库和应用上云，怎样做最靠谱？</a>
+                            </li>
+                                            </ul>
+                </div>
+            </div>
+            <!--相关话题 end-->
+        
+                                    <div class="sign-content yq-ads-blog yq-blog-sem-remove yq_blog_1813">
+                    <a onclick="bannerClick('1813')" href="https://yq.aliyun.com/articles/696719" target="_blank"><img src="https://yqfile.alicdn.com/img_28876de3f8693f38a9f99026e82dedbe.jpg" alt=""></a>
+                    <p class="ad-desc"><b></b></p>
+                </div>
+                        </div>
+</div>
+<input type="hidden" id="weibourl" name="weibourl" value="http://service.weibo.com/share/share.php?title=%E4%BD%BF%E7%94%A8minikube%E5%AE%89%E8%A3%85k8s%E5%8D%95%E8%8A%82%E7%82%B9%E9%9B%86%E7%BE%A4+%0A%0A%E4%BB%80%E4%B9%88%E6%98%AFminikube%0Aminikube%E6%98%AF%E4%B8%80%E6%AC%BE%E5%BF%AB%E9%80%9F%E5%9C%A8%E6%9C%AC%E5%9C%B0%E7%AC%94%E8%AE%B0%E6%9C%AC%E7%94%B5%E8%84%91%E4%B8%8A%E5%BC%80%E5%90%AF%E4%B8%80%E4%B8%AA%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%90%AD%E5%BB%BAkubernets%E5%8D%95%E8%8A%82%E7%82%B9kubernetes%E9%9B%86%E7%BE%A4%E7%9A%84%E5%B7%A5%E5%85%B7%EF%BC%8C%E5%9B%A0%E4%B8%BA%E4%B8%80%E4%BA%9B%E7%BD%91%E7%BB%9C%E7%9A%84%E5%8E%9F%E5%9B%A0%EF%BC%8C%E6%89%80%E4%BB%A5%E6%88%91%E8%BF%99%E9%87%8C%E4%BD%BF%E7%94%A8%E7%9A%84%E6%98%AF%E9%98%BF%E9%87%8C%E4%BA%91%E4%BF%AE%E6%94%B9%E8%BF%87%E7%9A%84minikube%0A%E5%AE%89%E8%A3%85%0A%E9%A6%96%E5%85%88%E4%BD%A0%E8%A6%81%E7%A1%AE%E4%BF%9D%E6%9C%AC%E5%9C%B0%E5%AE%89%E8%A3%85%E4%BA%86virtualbox%EF%BC%8C%E5%A6%82%E6%9E%9C%E4%BD%A0%E6%98%AF%E4%BD%BF%E7%94%A8linux%E7%9A%84%E8%BF%9Evirt...&amp;url=https%3A%2F%2Fyq.aliyun.com%2Farticles%2F574255"/>
+<input type="hidden" id="qrcodeurl" name="qrcodeurl" value="/api/qrcode?size=140&amp;key=d8f2fce53ce0860e3f73659f01ad7f5324f0102a&amp;text=https%3A%2F%2Fyq.aliyun.com%2Farticles%2F574255"/>
+<script>
+    $(function() {
+        $.ajax({
+            url:'/yqnew/api/wechatMiniProgram/qrcode?buildType=articles&paramId='+574255,
+            type:'GET',
+            success:function (data) {
+                $('#weixin-icon img').attr('src',data.data);
+            }
+        });
+        $(document).on('mouseenter', '.interest-opt', (e) => {
+            const event = e || widnow.evnet;
+            const $this = $(event.currentTarget);
+            if ($this.text().trim() === '已关注') {
+                   $this.addClass('over').text('取消关注');
+            }
+            $(document).on('mouseleave', '.interest-opt', (e) => {
+                $this.removeClass('over');
+                if ($this.text() === '取消关注') {
+                    $this.text('已关注');
+                }
+            })
+        });
+                                    countExpo('.yq_blog_1813',9);
+                                        countExpo('.yq_blog_detail_1803',16);
+        
+                                    countExpo('.yq_blog_sem_remove_1816',20);
+                        })
+
+   </script></div>
+<div class="yq-footer-links">
+            <dl class="link-item">
+            <dt class="item-title">热点导航</dt>
+            <dd class="item-content">
+                                    <a href="https://promotion.aliyun.com/ntms/act/flowbagidle.html" target="_blank" title="">闲时流量包</a>
+                                    <a href="https://www.aliyun.com/" target="_blank" title="">云计算</a>
+                                    <a href="https://market.aliyun.com/security" target="_blank" title="云安全">网络安全</a>
+                                    <a href="https://www.aliyun.com/aliware" target="_blank" title="分布式系统aliware">互联网架构</a>
+                                    <a href="https://yq.aliyun.com/ask/53742" target="_blank" title="云服务器ECS升级配置">ECS升级配置</a>
+                                    <a href="https://www.aliyun.com/product/iot" target="_blank" title=" 物联网套件"> 物联网</a>
+                            </dd>
+        </dl>
+                <dl class="link-item">
+            <dt class="item-title">用户关注</dt>
+            <dd class="item-content">
+                                    <a href="https://bbs.aliyun.com/read/301499.html" target="_blank" title="如何做好自动化测试">自动化测试</a>
+                                    <a href="https://www.aliyun.com/solution/all" target="_blank" title="行业解决方案">解决方案</a>
+                                    <a href="https://yq.aliyun.com/articles/34777" target="_blank" title="Linux中常用命令">linux命令</a>
+                                    <a href="https://www.aliyun.com/ " target="_blank" title="">云服务</a>
+                                    <a href="https://yq.aliyun.com/articles/92145" target="_blank" title="">JavaScript 函数</a>
+                                    <a href="https://yq.aliyun.com/articles/48786" target="_blank" title="服务器监控工具">服务器监控</a>
+                                    <a href="https://yq.aliyun.com/roundtable/56407" target="_blank" title="">Python语言</a>
+                                    <a href="https://www.aliyun.com/product/man" target="_blank" title="">移动数据分析</a>
+                            </dd>
+        </dl>
+                <dl class="link-item">
+            <dt class="item-title">更多推荐</dt>
+            <dd class="item-content">
+                                    <a href="https://yq.aliyun.com/articles/132294" target="_blank" title="用户体验质量控制">用户体验</a>
+                                    <a href="https://help.aliyun.com/product/26090.html" target="_blank" title="云数据库rds服务">云数据库Rds</a>
+                                    <a href="https://www.aliyun.com/product/slb/" target="_blank" title="负载均衡slb">负载均衡</a>
+                                    <a href="https://wanwang.aliyun.com" target="_blank" title="域名购买">域名注册</a>
+                                    <a href="https://whois.aliyun.com" target="_blank" title="域名whois查询工具">Whois查询</a>
+                                    <a href="https://help.aliyun.com/product/43570.html" target="_blank" title="DataV数据可视化文档">数据可视化</a>
+                                    <a href="https://beian.aliyun.com" target="_blank" title="网站备案查询">ICP备案查询</a>
+                                    <a href="https://yq.aliyun.com/zt" target="_blank" title="">主题地图</a>
+                                    <a href="https://edu.aliyun.com/" target="_blank" title="阿里云大学视频教程">阿里云大学</a>
+                                    <a href="https://wanwang.aliyun.com/domain/cn/" target="_blank" title=".cn域名">cn域名</a>
+                                    <a href="https://m.aliyun.com/yunqi/" target="_blank" title="">移动站</a>
+                                    <a href="https://bbs.aliyun.com/" target="_blank" title="">IT论坛</a>
+                                    <a href="https://www.aliyun.com/acts/product-section-2019/home" target="_blank" title="">阿里云开年Hi购季</a>
+                                    <a href="https://mail.aliyun.com/" target="_blank" title="">企业邮箱</a>
+                                    <a href="https://www.aliyun.com/acts/product-section-2019/new-users" target="_blank" title="">新用户优惠</a>
+                                    <a href="https://promotion.aliyun.com/ntms/act/product-section-2019/communication.html" target="_blank" title="">短信套餐</a>
+                            </dd>
+        </dl>
+    </div><script>
+    window.localconfigs = {
+            };
+    window.showDialog = {
+        "show" : false,
+        "cookieName" : "show_yq_login_dialog",
+        "cookieTTL" : 0.5,
+        "content" : '注册会员，查阅海量科技文章，更可获得阿里云千元新手礼包'
+    };
+    $(function () {
+        if (location.hash && location.hash == "#yqblog") {
+            $(".yq-blog-sem-remove").remove();
+        }
+        var alert_init = 0;
+        $("#low-score-notice").hover(function () {
+            if (alert_init == 0){
+                $.Alert("下载附件需要扣除  个积分，积分是社区的虚拟货币，当前帐号积分数量为 ，请满足条件后再进行操作, <a target=\"_blank\" href=\"https://yq.aliyun.com/articles/782\">如何获取积分</a>","积分不足",true);
+            }
+            alert_init = 1;
+        });
+        $("#download-notice").click(function(){
+            var _this = $(this);
+            if (alert_init == 0){
+                $.Confirm('下载附件需要扣除  个积分，积分是社区的虚拟货币，当前帐号积分数量 ，为请问是否继续？','确认下载',function (){
+                    alert_init = 1;
+                    _this.attr("href",_this.attr("data-href"));
+                    location.href = _this.attr("data-href");
+                });
+            }
+        });
+    })
+</script>
+                <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+      jax: ["input/TeX","output/HTML-CSS"],
+    });
+    </script>
+        <script type="text/javascript" async src="//yqfile.alicdn.com/mathjax/2.7.2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script>
+        $(function () {
+            function getProductPriceHtml(product,showOriginaAmount){
+                var cycle = product.price.cycle;
+                var unit = "";
+
+                if (product.type == 22) {
+                    unit = "";
+                }else if(cycle == "Month"){
+                    unit = "/月";
+                }else if (cycle == "Year") {
+                    if (product.price.duration == 100){
+                        unit = "/次";
+                    }else{
+                        unit = "/年";
+                    }
+                }else if (cycle == "Day") {
+                    unit = "/天";
+                }else if (cycle == "Week") {
+                    unit = "/周";
+                }
+
+                if(product.price.cuxiao == true && showOriginaAmount == true){
+                    return '<div class="a-price">￥<span class="money-info">' + product.price.tradeAmount + unit+'</span><span class="s-info">原价：¥ ' + product.price.originaAmount +unit+'</span> </div>'
+                }else{
+                    return '<div class="a-price">￥<span class="money-info">' + product.price.tradeAmount + unit+'</span></div>'
+                }
+            }
+
+            $(".yq-product").each(function(i,e){
+                var code = $(e).attr("title");
+                var title = $(e).html();
+                var method = '/yqapi/market/product/?code='+code;
+                $.ajax({
+                    type: 'get',
+                    url: method,
+                    async: true,
+                    dataType:"json",
+                    cache:false,
+                    success: function(data, status, xhr) {
+                        var product = data.data;
+                        product.name = $(e).text();
+
+                        var html = '<div class="a-panel" >' +
+                            '<div class="yq-a-market-item">' +
+                            '<a target="_blank" href="' + product.url +'" class="a-title">' + product.name + '</a>' +
+                            '<div class="item-detail">' +
+                            '<img src="'+ product.picture +'" alt="" class="pro-img" height="86">' +
+                            '<div class="pro-detail">' +
+                            '<div class="a-desc">' + product.desc +'</div>' +
+                            '<div class="a-bottom">' +
+                            getProductPriceHtml(product) +
+                            '<a target="_blank" href="' + product.url +'"><button class="y-btn-white y-btn-s" type="button">立即购买</button></a>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>';
+                        $(e).html(html);
+                    },
+                    error: function() {
+                        $(e).remove();
+                    }
+                });
+            });
+
+            
+        })
+    </script>
+  <!--[if IE 9]>
+  <script src="//g.alicdn.com/??aliyun/dblx/0.0.4/es5-shim.min.js,aliyun/dblx/0.0.4/es5-sham.min.js"></script>
+  <![endif]-->
+  <script src="//g.alicdn.com/aliyun/yunqi/1.0.99/scripts/common.js"></script>
+    <script src="//g.alicdn.com/aliyun/yunqi/1.0.99/scripts/teamBlogDetail.js"></script>
+  
+    <script type="application/hal+json">{
+        "@context": "https://ziyuan.baidu.com/contexts/cambrian.jsonld",
+        "@id": "https://yq.aliyun.com/articles/574255?spm=5176.10695662.1996646101.searchclickresult.2e432cd2NISoz0",
+        "appid": "1603340613662633",
+        "title": "使用minikube安装k8s单节点集群",
+        "images": "",
+        "pubDate": "2018-04-02T16:20:43",
+        "upDate": "2018-04-02T16:20:43",
+        "data":{
+            "webPage":{
+                "headline":"https://yq.aliyun.com/articles/574255?spm=5176.10695662.1996646101.searchclickresult.2e432cd2NISoz0",
+                "pcUrl":"https://yq.aliyun.com/articles/574255?spm=5176.10695662.1996646101.searchclickresult.2e432cd2NISoz0",
+                "wapUrl":"https://yq.aliyun.com/articles/574255?spm=5176.10695662.1996646101.searchclickresult.2e432cd2NISoz0",
+                "appUrl":"https://yq.aliyun.com/articles/574255?spm=5176.10695662.1996646101.searchclickresult.2e432cd2NISoz0",
+                "mipUrl":"https://yq.aliyun.com/articles/574255?spm=5176.10695662.1996646101.searchclickresult.2e432cd2NISoz0",
+                "datePublished": "2018-04-02T16:20:43"
+            }
+        }
+    }
+</script><script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+  <style>
+  a, a:link, a:visited {
+    color: #3366ff;
+  }
+
+  a:focus, a:hover {
+    color: #4775FF;
+    text-decoration: underline;
+  }
+  .copyright a img {vertical-align: baseline;}
+</style>
+  <script type="text/javascript" src="//www.aliyun.com/rgn/aliyun_footer?renderer=js"></script>
+  <script nonce="TAZ9TOM43L">
+      $(function(){
+        //头像打签
+        var icon_uids = [];
+        $("span[name^='experticon_']").each(function(i){
+            icon_uids[i] = $(this).attr('uid');
+        });
+        var method = '/api/getIcons/';
+
+        $.ajax({
+            type: 'POST',
+            url: method,
+            async: true,
+            dataType:"json", 
+            cache:false,
+            data: {icon_uids:icon_uids},
+            success: function(data, status, xhr) {
+                console.log(data);
+                if(data.errcode==0){
+                    for(var i in data.data.expert){
+                        if(data.data.expert[i].isexpert==1){//专家签
+                            $("span[name='experticon_"+i+"']").each(function(){
+                                var size = $(this).attr("size") || 'big';
+                                var width;
+                                size == 'big' ? size='middle':'';
+                                size=='middle' ? width = '16px;' :'';
+                                size=='small' ? width = '14px;' :'';
+                                if(data.data.expert[i].category==2){//阿里专家
+                                    var img_src = '//img.alicdn.com/tps/TB15.8xOpXXXXX1XFXXXXXXXXXX-14-14.png';
+                                }else{
+                                    var img_src = '//img.alicdn.com/tps/TB1rR75OXXXXXXKaFXXXXXXXXXX-14-14.png';
+                                }
+                                $(this).html('<img src="'+img_src+'" style="width: '+width+'height: '+width+'margin-right: 10px;" title="专家认证"/>');                        
+                            });
+                        }
+                    }
+
+                    for(var n in data.data.mvp){
+                        $("span[name='experticon_"+data.data.mvp[n]+"']").each(function(){
+                            $(this).after('<img src="//yqfile.alicdn.com/777a8d68e6349091f2be06099eefaa36.png" alt="" style="margin-left: 0;height: 15px;width: 21px;">');
+                        });
+                    }
+                }
+            },
+            error: function(xhr, type, error) {
+                console.log(error.toString());
+            }
+        });
+    });
+  </script>
+  <script src='//w.cnzz.com/c.php?id=1256835944' language='JavaScript'></script>
+  <script src='//w.cnzz.com/c.php?id=1256757167' language='JavaScript'></script>
+  <script src="//g.alicdn.com/??aliyun/www-dpl/0.5.12/knight/js/data-statistics.js"></script>
+  <script type="text/javascript"  nonce="TAZ9TOM43L">
+
+    window.configs  = { "csrf-param": "yunqi_csrf",
+                        "csrf-token": "R7E1UU79K1",
+                        "islogin": false,
+                        "registerurl": "https://account.aliyun.com/register/register.htm?from_type=yqclub&oauth_callback=https%3A%2F%2Fyq.aliyun.com%2Farticles%2F574255%3Fspm%3D5176.10695662.1996646101.searchclickresult.2e432cd2NISoz0%26do%3Dlogin",
+                        "loginurl": "https://account.aliyun.com/login/login.htm?from_type=yqclub&oauth_callback=https%3A%2F%2Fyq.aliyun.com%2Farticles%2F574255%3Fspm%3D5176.10695662.1996646101.searchclickresult.2e432cd2NISoz0%26do%3Dlogin",
+                        "isNeedNickname": false,
+                        "isNew": false                      };
+      const countExpo = (ele,length) => {
+          var objId= ele.substring(length);
+          let ctr = true;
+          if ($(window).scrollTop() < $(ele).offset().top+$(ele).height() && $(window).scrollTop() > $(ele).offset().top-$(window).height()) { //本身在可视区
+              $.get('/yqapi/banner/exposure',{bannerId:objId});
+          } else {
+              $(window).on('scroll', () => { //不在可视区滚动触发
+                  if ($(window).scrollTop() < $(ele).offset().top+$(ele).height() && $(window).scrollTop() > $(ele).offset().top-$(window).height() && ctr) {
+                      $.get('/yqapi/banner/exposure',{bannerId:objId});
+                      ctr = false;
+                  }
+              })
+          }
+      }
+          window.right_bottom_ads = {"img":"https:\/\/yqfile.alicdn.com\/img_7f351600589bd349640346e527fb7c82.jpg","pid":"","title":"\u4e0eRuby\u521b\u59cb\u4eba\u9762\u5bf9\u9762","link":"https:\/\/yq.aliyun.com\/activity\/819?spm=a2c4e.11153940.blogad.1.2b9f291aEN8S7k","tip":"","bgcolor":"","id":1807};
+      setTimeout(function () {
+          $('.yq-a-r-bottom').addClass('yq_a_r_bottom_'+window.right_bottom_ads.id);
+          countExpo('.yq_a_r_bottom_'+window.right_bottom_ads.id,15);
+      },0)
+      $('body').on('click', '.yq-a-r-bottom img', function (data) {
+          bannerClick(window.right_bottom_ads.id);
+      })
+
+    
+    function bannerClick(bannerId)
+    {
+        $.get('/yqapi/banner/click',{bannerId:bannerId});
+        // window.location.href=''+link+'';
+    }
+
+  </script>
+</body>
+</html>

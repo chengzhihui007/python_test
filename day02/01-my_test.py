@@ -1,22 +1,18 @@
-import urllib.request
-import urllib.parse
 import string
+import urllib.request
 
 
-def my_test():
-    print("start~")
+def load_baidu():
     url = "http://www.baidu.com/s?"
-    param = "wd=大宝剑"
-    params = {"wd":"大宝剑2","wd2":"ddd"}
-    print(urllib.parse.quote(param,safe=string.printable))
-    print(urllib.parse.urlencode(params))
-    with open("my_test_even04.html", "w", encoding="UTF-8")as t:
-        t.write(urllib.request.urlopen(url+urllib.parse.quote(param,safe=string.printable)).read().decode())
-
-    print("second~")
-    with open("my_test_even04-02.html", "w", encoding="UTF-8")as t:
-        t.write(urllib.request.urlopen(url+urllib.parse.urlencode(params)).read().decode())
-    print("end.")
+    # param = "wd=大宝剑"
+    params = {"wd":"大宝剑"}
+    final_url = url +urllib.parse.urlencode(params)
+    print(final_url)
+    request = urllib.request.Request(final_url)
+    response = urllib.request.urlopen(final_url)
+    data = response.read().decode()
+    with open("data.html", "w", encoding="UTF-8")as t:
+        t.write(data)
 
 
-my_test()
+load_baidu()
