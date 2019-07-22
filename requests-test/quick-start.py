@@ -125,10 +125,46 @@ import requests
 # print(r.text)
 
 #Cookie的返回对象为RequestsCookieJar,
-jar = requests.cookies.RquestsCookieJar()
+# jar = requests.cookies.RequestsCookieJar()
+# jar.set('tasty_cookie', 'yum', domain='httpbin.org', path='/cookies')
+# jar.set('gross_cookie', 'blech', domain='httpbin.org', path='/elsewhere')
+# url = 'http://httpbin.org/cookies'
+# r = requests.get(url, cookies=jar)
+# print(r.text)
 
-#http://2.python-requests.org/zh_CN/latest/user/quickstart.html
-#to be continue ...
+
+#重定向与请求历史
+# r = requests.get('http://github.com')
+# print(r.url)
+# print(r.status_code)
+# print(r.history)
+
+#如果是get、options、post、put、patch或者delete,那么你可以通过allow_redirects 禁用重定向：
+# r = requests.get('http://github.com', allow_redirects=False)
+# print(r.status_code)
+# print(r.history)
+
+#如果使用了head，可以启用重定向
+# r = requests.head('http://github.com', allow_redirects=True)
+# print(r.url)
+# print(r.history)
+
+#超时
+# requests.get('http://github.com',timeout=0.001)
+
+
+#错误与异常
+# 遇到网络问题(如：DNS查询失败、拒绝连接等)时，Requests会抛出一个ConnectionError异常。
+# 如果HTTP请求返回了不成功的状态码，Response.raise_for_status()会抛出一个HttpError异常。
+# 若请求超时，则抛出一个Timeout异常。
+# 若请求超时了设定的最大重定向次数，则会抛出一个TooManyRedirects异常。
+# 所有Requests显示抛出的异常都继承自requests.exceptions.RequestException。
+
+
+
+
+
+
 
 
 
