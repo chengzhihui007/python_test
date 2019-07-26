@@ -13,7 +13,7 @@ class BookSpider(object):
     #1.构建所有url
     def get_url_list(self):
         url_list = []
-        for i in range(1,11):
+        for i in range(1,2):
             url = self.base_url.format(i)
             url_list.append(url)
 
@@ -43,6 +43,9 @@ class BookSpider(object):
             book_dict['book_author'] = book.xpath('.//h5[@class="entry-author"]/a/text()')
             #4.书的简介
             book_dict['book_summary'] = book.xpath('.//div[@class="entry-summary"]/p/text()')
+            #5.书的url
+            book_dict['book_url'] = book.xpath('.//h2[@class="entry-title"]/a/@src')
+            print(book_dict)
             self.data_list.append(book_dict)
 
     def parse_bs4_data(self,data):
@@ -58,7 +61,18 @@ class BookSpider(object):
             book_dict['book_author'] = book.select_one('.entry-author a').get_text()
             #4.书的简介
             book_dict['book_summary'] = book.select_one('.entry-summary p').get_text()
+            #5.书的url
+            book_dict['book_url'] = book.select_one('.entry-title a').get('href')
+            data = self.send_request(book_dict['book_url'])
+            book_download_url = self.parse_bs4_detail_data(data)
+            #6.书的下载路径
+            book_dict['book_download_url'] = book_download_url
             self.data_list.append(book_dict)
+
+    def parse_bs4_detail_data(self,data):
+        bs4_detail_data = BeautifulSoup(data,'lxml')
+        book_download_url = bs4_detail_data.select_one('.download-links a').get('href')
+        return book_download_url
     #4.保存数据
     def save_data(self):
         # with open('book.html', 'w',encoding='utf-8') as f:
